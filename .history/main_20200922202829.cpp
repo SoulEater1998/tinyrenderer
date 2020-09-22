@@ -15,14 +15,13 @@ int main(int argc, char** argv) {
 	memset(zbuffer,0,sizeof(zbuffer));
 	for (int i=0; i<af_face.nfaces(); i++) { 
     	std::vector<int> face = af_face.face(i);
-		std::vector<int> texture_face = af_face.texture_face(i); 
+		std::vector<int> tecture_face = af_face.texture_face(i); 
     	Vec3f screen_coords[3];
-		Vec2i texture_coords[3];
+		Vec2f texture_coords[3];
 		Vec3f world_coords[3]; 
     	for (int j=0; j<3; j++) { 
         	Vec3f v = af_face.vert(face[j]);
-			Vec2f tv = af_face.texture_vert(texture_face[j]);
-			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
+			Vec2f tv = af_face.texture_vert(texture_face)
 			//垂直投影
         	screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//保存世界坐标计算法向量
@@ -31,7 +30,7 @@ int main(int argc, char** argv) {
 		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]);
 		//材质默认为漫反射材质
 		float intensity = n.normalize()*light_dir; 
-    	if(intensity>0) triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
+    	if(intensity>0) triangle(screen_coords, zbuffer, image, TGAColor(intensity*255, intensity*255, intensity*255, 255)); 
 	}
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");

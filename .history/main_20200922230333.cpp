@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     	for (int j=0; j<3; j++) { 
         	Vec3f v = af_face.vert(face[j]);
 			Vec2f tv = af_face.texture_vert(texture_face[j]);
-			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
+			texture_coords[j] = Vec2i((int)(tv.x*texture.get_height()),(int)(tv.y*texture.get_width()));
 			//垂直投影
         	screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//保存世界坐标计算法向量

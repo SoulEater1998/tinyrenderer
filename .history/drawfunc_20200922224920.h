@@ -106,11 +106,7 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 zbuffer[int(P.x+P.y*width)]=P.z;
                 Pt.x = vts[0].x*bc_screen.x+vts[1].x*bc_screen.y+vts[2].x*bc_screen.z;
                 Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
-                TGAColor tempc = tecture.get(Pt.x,Pt.y);
-                tempc.r *= intensity;
-                tempc.g *= intensity;  
-                tempc.b *= intensity; 
-                image.set(P.x, P.y, tempc); 
+                image.set(P.x, P.y, tecture.get(Pt.x,Pt.y)); 
             }
         } 
     }
