@@ -25,12 +25,9 @@ int main(int argc, char** argv) {
 			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
 			//垂直投影
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
-			//先透视再放大
-			Vec3f pv = my_perspective(2.4f, 4.f, Vec3f(v.x, v.y, v.z-3.f));
-			screen_coords[j] = Vec3f((pv.x+1.f)*height/2, (pv.y+1.f)*height/2, pv.z);
-			//先放大再透视(失败，事实上所谓放大是将图像进行了平移和缩放)
-			//Vec3f pv = my_perspective(1.f, 3.f, Vec3f((v.x+1.f)*height/2, (v.y+1.f)*height/2, v.z-2.f));
-			//screen_coords[j] = pv;
+			//透视投影
+			Vec3f pv = my_perspective(1.f, 3.f, Vec3f(v.x, v.y, 2.f-v.z));
+			screen_coords[j] = Vec3f((pv.x+1.f)*height/2, (pv.y+1.f)*height/2, -pv.z);
 			//保存世界坐标计算法向量
 			world_coords[j] = v;
     	}

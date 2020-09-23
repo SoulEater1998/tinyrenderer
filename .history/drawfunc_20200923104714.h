@@ -115,7 +115,3 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
         } 
     }
 }
-
-Vec3f my_perspective(float n, float f, Vec3f point){
-	return Vec3f(-point.x*n/point.z, -point.y*n/point.z, (point.z*(n+f)-n*f)/point.z);
-}
