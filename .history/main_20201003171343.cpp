@@ -4,17 +4,13 @@
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
-Vec3f       eye(-1,1,3);
-Vec3f    center(0,0,0);
-Vec3f        up(0,1,0);
-Vec3f light_dir(1,1,-1);
 
 int main(int argc, char** argv) {
 	TGAImage image(1920, 1080, TGAImage::RGB);
 	TGAImage texture;
 	texture.read_tga_file("african_head_diffuse.tga");
 	Model af_face("african_head.obj");
-	//Vec3f light_dir(0,0,-1);
+	Vec3f light_dir(0,0,-1);
 	float zbuffer[width*height];
 	memset(zbuffer,0,sizeof(zbuffer));
 	for (int i=0; i<af_face.nfaces(); i++) { 
@@ -31,10 +27,10 @@ int main(int argc, char** argv) {
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//先透视再放大
 			//formule转cuboid
-			Matrix pv = viewport(0,0,height,height)*my_perspective(2.4f, 4.f, -3.f)*(lookat(eye,center,up)*Matrix(v));
+			Matrix pv = my_perspective(2.4f, 4.f)*(lookat(Vec3f(2.f,2.f,2.f),Vec3f(1.f,1.f,1.f),Vec3f(0,0,1.f))*Matrix(v));
 			//直接投影到背后
 			//Vec3f pv = my_perspective(2.4f, Vec3f(v.x, v.y, v.z-1.f));
-			screen_coords[j] = Vec3f(pv[0][0]/pv[3][0],pv[1][0]/pv[3][0],pv[2][0]/pv[3][0]);
+			screen_coords[j] = Vec3f((pv.x+1.f)*height/2, (pv.y+1.f)*height/2, pv.z);
 			//先放大再透视(失败，事实上所谓放大是将图像进行了平移和缩放)
 			//Vec3f pv = my_perspective(1.f, 3.f, Vec3f((v.x+1.f)*height/2, (v.y+1.f)*height/2, v.z-2.f));
 			//screen_coords[j] = pv;

@@ -34,17 +34,6 @@ template <class t> struct Vec3 {
 	inline t       operator *(const Vec3<t> &v) const { return x*v.x + y*v.y + z*v.z; }
 	float norm () const { return std::sqrt(x*x+y*y+z*z); }
 	Vec3<t> & normalize(t l=1) { *this = (*this)*(l/norm()); return *this; }
-	t operator[](const int i){
-		switch (i)
-		{
-		case 0:
-			return x;
-		case 1:
-			return y;
-		default:
-			return z;
-		}
-	}
 	template <class > friend std::ostream& operator<<(std::ostream& s, Vec3<t>& v);
 };
 

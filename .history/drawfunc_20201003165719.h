@@ -124,19 +124,6 @@ Vec3f my_perspective(float c, Vec3f point){
     return Vec3f(point.x/(1-point.z/c), point.y/(1-point.z/c), point.z/(1-point.z/c));
 }
 
-Matrix my_perspective(float n, float f, float k){
-    Matrix m = Matrix::identity(4);
-    Matrix mov = Matrix::identity(4);
-    mov[2][3] = k;
-    m[0][0] = n;
-    m[1][1] = -n;
-    m[2][2] = n+f;
-    m[2][3] = -n*f;
-    m[3][2] = 1;
-    m[3][3] = 0;
-    return m*mov;
-}
-
 Matrix lookat(Vec3f eye, Vec3f center, Vec3f up) {
     Vec3f z = (eye-center).normalize();
     Vec3f x = (up^z).normalize();

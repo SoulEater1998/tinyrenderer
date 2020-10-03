@@ -117,49 +117,9 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
 }
 
 Vec3f my_perspective(float n, float f, Vec3f point){
-	return Vec3f(point.x*n/point.z, -point.y*n/point.z, (point.z*(n+f)-n*f)/point.z);
+	return Vec3f(-point.x*n/point.z, -point.y*n/point.z, (point.z*(n+f)-n*f)/point.z);
 }
 
 Vec3f my_perspective(float c, Vec3f point){
     return Vec3f(point.x/(1-point.z/c), point.y/(1-point.z/c), point.z/(1-point.z/c));
-}
-
-Matrix my_perspective(float n, float f, float k){
-    Matrix m = Matrix::identity(4);
-    Matrix mov = Matrix::identity(4);
-    mov[2][3] = k;
-    m[0][0] = n;
-    m[1][1] = -n;
-    m[2][2] = n+f;
-    m[2][3] = -n*f;
-    m[3][2] = 1;
-    m[3][3] = 0;
-    return m*mov;
-}
-
-Matrix lookat(Vec3f eye, Vec3f center, Vec3f up) {
-    Vec3f z = (eye-center).normalize();
-    Vec3f x = (up^z).normalize();
-    Vec3f y = (z^x).normalize();
-    Matrix Minv = Matrix::identity(4);
-    Matrix Tr   = Matrix::identity(4);
-    for (int i=0; i<3; i++) {
-        Minv[0][i] = x[i];
-        Minv[1][i] = y[i];
-        Minv[2][i] = z[i];
-        Tr[i][3] = -center[i];
-    }
-    return Minv*Tr;
-}
-
-Matrix viewport(int x, int y, int w, int h) {
-    Matrix m = Matrix::identity(4);
-    m[0][3] = x+w/2.f;
-    m[1][3] = y+h/2.f;
-    m[2][3] = 1.f;
-
-    m[0][0] = w/2.f;
-    m[1][1] = h/2.f;
-    m[2][2] = 1.f;
-    return m;
 }
