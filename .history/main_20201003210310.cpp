@@ -8,7 +8,7 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 Vec3f       eye(-1,1,3);
 Vec3f    center(0,0,0);
 Vec3f        up(0,1,0);
-Vec3f light_dir(0,0,-1);
+Vec3f light_dir(1,1,-1);
 
 struct vertex_normal{
 	Vec3f normal;

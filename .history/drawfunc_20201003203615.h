@@ -142,7 +142,6 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
                 pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
                 float intensity = pix_normal * light;
-                if(intensity <= 0) continue;
                 TGAColor tempc = tecture.get(Pt.x,Pt.y);
                 tempc.r *= intensity;
                 tempc.g *= intensity;  

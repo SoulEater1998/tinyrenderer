@@ -8,7 +8,7 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 Vec3f       eye(-1,1,3);
 Vec3f    center(0,0,0);
 Vec3f        up(0,1,0);
-Vec3f light_dir(0,0,-1);
+Vec3f light_dir(1,1,-1);
 
 struct vertex_normal{
 	Vec3f normal;
@@ -68,8 +68,7 @@ int main(int argc, char** argv) {
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//先透视再放大
 			//变换
-			//Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * (lookat(eye,center,up) * Matrix(v));
-			Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * Matrix(v);
+			Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * (lookat(eye,center,up) * Matrix(v));
 			//直接投影到背后
 			//Vec3f pv = my_perspective(2.4f, Vec3f(v.x, v.y, v.z-1.f));
 			screen_coords[j] = Vec3f(pv[0][0]/pv[3][0],pv[1][0]/pv[3][0],pv[2][0]/pv[3][0]);
@@ -83,10 +82,8 @@ int main(int argc, char** argv) {
 		//材质默认为漫反射材质
 		float intensity = n.normalize()*light_dir; 
     	if(intensity>0){
-			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
-						vertices_normal[index[0]].av_normal(), 
-						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal());
+			// triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
+			//				vertices_normal[index[0]].normal, vertices_normal[index[1]].normal, vertices_normal[index[2]].normal);
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 		} 
 	}

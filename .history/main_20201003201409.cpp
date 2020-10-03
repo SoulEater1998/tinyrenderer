@@ -8,14 +8,12 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 Vec3f       eye(-1,1,3);
 Vec3f    center(0,0,0);
 Vec3f        up(0,1,0);
-Vec3f light_dir(0,0,-1);
+Vec3f light_dir(1,1,-1);
 
 struct vertex_normal{
 	Vec3f normal;
 	float all;
-	Vec3f av_normal(){
-		return normal/all;
-	}
+	vertex_normal(Vec3f n,float a=1):normal(n),all(a) {}
 };
 
 
@@ -31,25 +29,14 @@ int main(int argc, char** argv) {
 	std::map<int,vertex_normal> vertices_normal;
 	for (int i=0; i<af_face.nfaces(); i++){
 		std::vector<int> face = af_face.face(i);
-		Vec3f world_coords[3];
-		int world_index[3]; 
+		Vec3f world_coords[3]; 
 		for (int j=0; j<3; j++){
-			world_index[j] = face[j];
-			world_coords[j] = af_face.vert(world_index[j]);
+			Vec3f v = af_face.vert(face[j]);
+			world_coords[j] = v;
 		}
-		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]).normalize();
+		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]);
 		for (int j=0; j<3; j++){
-			std::map<int,vertex_normal>::iterator it = vertices_normal.find(world_index[j]);
-			if(it != vertices_normal.end()){
-				it->second.normal=it->second.normal+n;
-				it->second.all+=1;
-			}
-			else{
-				vertex_normal tempv;
-				tempv.normal = n;
-				tempv.all = 1.f;
-				vertices_normal[world_index[j]] = tempv;
-			}
+			if(vertices_normal.find(af_face.vert(i)))
 		}
 	}
 	for (int i=0; i<af_face.nfaces(); i++) { 
@@ -57,19 +44,16 @@ int main(int argc, char** argv) {
 		std::vector<int> texture_face = af_face.texture_face(i); 
     	Vec3f screen_coords[3];
 		Vec2i texture_coords[3];
-		Vec3f world_coords[3];
-		int index[3]; 
+		Vec3f world_coords[3]; 
     	for (int j=0; j<3; j++) { 
-			index[j] = face[j];
-        	Vec3f v = af_face.vert(index[j]);
+        	Vec3f v = af_face.vert(face[j]);
 			Vec2f tv = af_face.texture_vert(texture_face[j]);
 			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
 			//垂直投影
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//先透视再放大
-			//变换
-			//Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * (lookat(eye,center,up) * Matrix(v));
-			Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * Matrix(v);
+			//formule转cuboid
+			Matrix pv = viewport(0,0,height,height)*my_perspective(2.4f, 4.f, -3.f)*(lookat(eye,center,up)*Matrix(v));
 			//直接投影到背后
 			//Vec3f pv = my_perspective(2.4f, Vec3f(v.x, v.y, v.z-1.f));
 			screen_coords[j] = Vec3f(pv[0][0]/pv[3][0],pv[1][0]/pv[3][0],pv[2][0]/pv[3][0]);
@@ -82,13 +66,7 @@ int main(int argc, char** argv) {
 		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]);
 		//材质默认为漫反射材质
 		float intensity = n.normalize()*light_dir; 
-    	if(intensity>0){
-			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
-						vertices_normal[index[0]].av_normal(), 
-						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal());
-			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
-		} 
+    	if(intensity>0) triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 	}
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");

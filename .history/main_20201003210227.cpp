@@ -8,7 +8,7 @@ const TGAColor red   = TGAColor(255, 0,   0,   255);
 Vec3f       eye(-1,1,3);
 Vec3f    center(0,0,0);
 Vec3f        up(0,1,0);
-Vec3f light_dir(0,0,-1);
+Vec3f light_dir(1,1,-1);
 
 struct vertex_normal{
 	Vec3f normal;
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 			//先透视再放大
 			//变换
 			//Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * (lookat(eye,center,up) * Matrix(v));
-			Matrix pv = viewport(0,0,height,height) * my_perspective(2.4f, 4.f, -3.f) * Matrix(v);
+			Matrix pv = my_perspective(2.4f, 4.f, -3.f) * Matrix(v);
 			//直接投影到背后
 			//Vec3f pv = my_perspective(2.4f, Vec3f(v.x, v.y, v.z-1.f));
 			screen_coords[j] = Vec3f(pv[0][0]/pv[3][0],pv[1][0]/pv[3][0],pv[2][0]/pv[3][0]);

@@ -116,7 +116,7 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
     }
 }
 
-void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, Vec3f light,
+void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, float intensity,
                 Vec3f n1, Vec3f n2, Vec3f n3){
     Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
     Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
@@ -133,16 +133,12 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
     for (P.x=(int)bboxmin.x; P.x<=bboxmax.x; P.x++) { 
         for (P.y=(int)bboxmin.y; P.y<=bboxmax.y; P.y++) { 
             Vec3f bc_screen  = barycentric(pts, P); 
-            Vec3f pix_normal;
             if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
             P.z=pts[0].z*bc_screen.x+pts[1].z*bc_screen.y+pts[2].z*bc_screen.z;
             if(zbuffer[int(P.x+P.y*width)]<P.z){
                 zbuffer[int(P.x+P.y*width)]=P.z;
                 Pt.x = vts[0].x*bc_screen.x+vts[1].x*bc_screen.y+vts[2].x*bc_screen.z;
                 Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
-                pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
-                float intensity = pix_normal * light;
-                if(intensity <= 0) continue;
                 TGAColor tempc = tecture.get(Pt.x,Pt.y);
                 tempc.r *= intensity;
                 tempc.g *= intensity;  
