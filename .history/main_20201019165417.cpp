@@ -83,17 +83,17 @@ int main(int argc, char** argv) {
 			//Vec3f pv = my_perspective(1.f, 3.f, Vec3f((v.x+1.f)*height/2, (v.y+1.f)*height/2, v.z-2.f));
 			//screen_coords[j] = pv;
 			//保存世界坐标计算法向量
-			world_coords[j] = v;
+			world_coords[j] = lookat(eye,center,up) * Matrix(v);
     	}
 		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]);
 		//材质默认为漫反射材质
 		float intensity = n.normalize()*light_dir; 
+		float 
     	if(intensity>0){
 			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 						vertices_normal[index[0]].av_normal(), 
 						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal(),
-						eye);
+						vertices_normal[index[2]].av_normal());
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 			//			world_norms[0], world_norms[1], world_norms[2]);

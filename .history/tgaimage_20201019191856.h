@@ -62,10 +62,8 @@ struct TGAColor {
 		return TGAColor(r * x, g * x, b * x, a);
 	}
 
-	TGAColor operator ^ (const float x);
-
-	TGAColor operator + (const TGAColor &c){
-		return TGAColor(r + c.r, g + c.g, b + c.b, a);
+	TGAColor operator ^ (const float x){
+		return TGAColor(pow(x, r), pow(x, g), pow(x, b), a);
 	}
 };
 

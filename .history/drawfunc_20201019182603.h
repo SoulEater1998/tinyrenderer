@@ -181,10 +181,10 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 float intensity = pix_normal * light;
                 if(intensity <= 0) continue;
                 TGAColor tempc = tecture.get(Pt.x,Pt.y);
-                TGAColor diffuse = tempc * intensity;
-                TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
-                TGAColor ambient(5, 5, 5, 0);
-                image.set(P.x, P.y, diffuse + specular * 0.6 + ambient); 
+                tempc.r *= intensity;
+                tempc.g *= intensity;  
+                tempc.b *= intensity; 
+                image.set(P.x, P.y, tempc); 
             }
         } 
     }

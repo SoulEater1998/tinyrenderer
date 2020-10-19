@@ -153,43 +153,6 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
     }
 }
 
-void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, Vec3f light,
-                Vec3f n1, Vec3f n2, Vec3f n3, Vec3f eye){
-    Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
-    Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
-    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
-    for (int i=0; i<3; i++) { 
-        bboxmin.x = std::max(0.f,     std::min(bboxmin.x, pts[i].x)); 
-        bboxmax.x = std::min(clamp.x, std::max(bboxmax.x, pts[i].x)); 
-        bboxmin.y = std::max(0.f,     std::min(bboxmin.y, pts[i].y)); 
-        bboxmax.y = std::min(clamp.y, std::max(bboxmax.y, pts[i].y)); 
-        //TODO:optimize
-    } 
-    Vec3f P; 
-    Vec2i Pt;
-    for (P.x=(int)bboxmin.x; P.x<=bboxmax.x; P.x++) { 
-        for (P.y=(int)bboxmin.y; P.y<=bboxmax.y; P.y++) { 
-            Vec3f bc_screen  = barycentric(pts, P); 
-            Vec3f pix_normal;
-            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
-            P.z=pts[0].z*bc_screen.x+pts[1].z*bc_screen.y+pts[2].z*bc_screen.z;
-            if(zbuffer[int(P.x+P.y*width)]<P.z){
-                zbuffer[int(P.x+P.y*width)]=P.z;
-                Pt.x = vts[0].x*bc_screen.x+vts[1].x*bc_screen.y+vts[2].x*bc_screen.z;
-                Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
-                pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
-                float intensity = pix_normal * light;
-                if(intensity <= 0) continue;
-                TGAColor tempc = tecture.get(Pt.x,Pt.y);
-                TGAColor diffuse = tempc * intensity;
-                TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
-                TGAColor ambient(5, 5, 5, 0);
-                image.set(P.x, P.y, diffuse + specular * 0.6 + ambient); 
-            }
-        } 
-    }
-}
-
 Vec3f my_perspective(float n, float f, Vec3f point){
 	return Vec3f(point.x*n/point.z, -point.y*n/point.z, (point.z*(n+f)-n*f)/point.z);
 }

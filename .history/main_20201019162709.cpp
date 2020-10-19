@@ -62,14 +62,14 @@ int main(int argc, char** argv) {
     	Vec3f screen_coords[3];
 		Vec2i texture_coords[3];
 		Vec3f world_coords[3];
-		//Vec3f world_norms[3];
+		Vec3f world_norms[3];
 		int index[3]; 
     	for (int j=0; j<3; j++) { 
 			index[j] = face[j];
         	Vec3f v = af_face.vert(index[j]);
 			Vec2f tv = af_face.texture_vert(texture_face[j]);
 			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
-			//world_norms[j] = af_face.norm(index[j]);
+			world_norms[j] = af_face.norm(index[j]);
 			//垂直投影
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//先透视再放大
@@ -92,8 +92,7 @@ int main(int argc, char** argv) {
 			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 						vertices_normal[index[0]].av_normal(), 
 						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal(),
-						eye);
+						vertices_normal[index[2]].av_normal());
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 			//			world_norms[0], world_norms[1], world_norms[2]);

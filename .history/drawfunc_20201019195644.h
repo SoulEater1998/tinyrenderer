@@ -184,7 +184,7 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 TGAColor diffuse = tempc * intensity;
                 TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
                 TGAColor ambient(5, 5, 5, 0);
-                image.set(P.x, P.y, diffuse + specular * 0.6 + ambient); 
+                image.set(P.x, P.y, diffuse + specular + ambient); 
             }
         } 
     }

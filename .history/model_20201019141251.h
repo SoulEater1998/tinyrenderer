@@ -21,7 +21,6 @@ public:
 	Vec2f texture_vert(int i);
 	std::vector<int> face(int idx);
 	std::vector<int> texture_face(int idx);
-	Vec3f norm(int i);
 };
 
 

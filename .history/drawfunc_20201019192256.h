@@ -154,7 +154,7 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
 }
 
 void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, Vec3f light,
-                Vec3f n1, Vec3f n2, Vec3f n3, Vec3f eye){
+                Vec3f n1, Vec3f n2, Vec3f n3, Vec3f eye, Vec3f *wts){
     Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
     Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
     Vec2f clamp(image.get_width()-1, image.get_height()-1); 
@@ -182,9 +182,8 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 if(intensity <= 0) continue;
                 TGAColor tempc = tecture.get(Pt.x,Pt.y);
                 TGAColor diffuse = tempc * intensity;
-                TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
-                TGAColor ambient(5, 5, 5, 0);
-                image.set(P.x, P.y, diffuse + specular * 0.6 + ambient); 
+                TGAColor specular = tempc ^ ()
+                image.set(P.x, P.y, tempc); 
             }
         } 
     }

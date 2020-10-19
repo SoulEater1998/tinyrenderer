@@ -21,6 +21,7 @@ struct vertex_normal{
 struct World_point{
 	int index;
 	Vec3f coord;
+	Vec3f norm;
 };
 
 
@@ -34,16 +35,17 @@ int main(int argc, char** argv) {
 	memset(zbuffer,0,sizeof(zbuffer));
 	//normal average
 	std::map<int,vertex_normal> vertices_normal;
-	for (int i=0; i<af_face.nfaces(); i++){
+	/*for (int i=0; i<af_face.nfaces(); i++){
 		std::vector<int> face = af_face.face(i);
 		World_point world_points[3];
 		for (int j=0; j<3; j++){
 			world_points[j].index = face[j];
 			world_points[j].coord = af_face.vert(world_points[j].index);
+			world_points[j].norm = af_face.norm(world_points[j].index);
 		}
-		Vec3f n = (world_points[2].coord-world_points[0].coord)^(world_points[1].coord-world_points[0].coord).normalize();
+		Vec3f n = (world_coords[2]-world_coords[0])^(world_coords[1]-world_coords[0]).normalize();
 		for (int j=0; j<3; j++){
-			std::map<int,vertex_normal>::iterator it = vertices_normal.find(world_points[j].index);
+			std::map<int,vertex_normal>::iterator it = vertices_normal.find(world_index[j]);
 			if(it != vertices_normal.end()){
 				it->second.normal=it->second.normal+n;
 				it->second.all+=1;
@@ -52,24 +54,24 @@ int main(int argc, char** argv) {
 				vertex_normal tempv;
 				tempv.normal = n;
 				tempv.all = 1.f;
-				vertices_normal[world_points[j].index] = tempv;
+				vertices_normal[world_index[j]] = tempv;
 			}
 		}
-	}
+	}*/
 	for (int i=0; i<af_face.nfaces(); i++) { 
     	std::vector<int> face = af_face.face(i);
 		std::vector<int> texture_face = af_face.texture_face(i); 
     	Vec3f screen_coords[3];
 		Vec2i texture_coords[3];
 		Vec3f world_coords[3];
-		//Vec3f world_norms[3];
+		Vec3f world_norms[3];
 		int index[3]; 
     	for (int j=0; j<3; j++) { 
 			index[j] = face[j];
         	Vec3f v = af_face.vert(index[j]);
 			Vec2f tv = af_face.texture_vert(texture_face[j]);
 			texture_coords[j] = Vec2i((int)((1-tv.x)*texture.get_height()),(int)((1-tv.y)*texture.get_width()));
-			//world_norms[j] = af_face.norm(index[j]);
+			world_norms[j] = af_face.norm(index[j]);
 			//垂直投影
         	//screen_coords[j] = Vec3f((v.x+1.f)*height/2., (v.y+1.f)*height/2., v.z+1.f); 
 			//先透视再放大
@@ -89,14 +91,13 @@ int main(int argc, char** argv) {
 		//材质默认为漫反射材质
 		float intensity = n.normalize()*light_dir; 
     	if(intensity>0){
-			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
-						vertices_normal[index[0]].av_normal(), 
-						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal(),
-						eye);
-			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
-			//			world_norms[0], world_norms[1], world_norms[2]);
+			//			vertices_normal[index[0]].av_normal(), 
+			//			vertices_normal[index[1]].av_normal(), 
+			//			vertices_normal[index[2]].av_normal());
+			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
+			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
+						world_norms[0], world_norms[1], world_norms[2]);
 		} 
 	}
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image

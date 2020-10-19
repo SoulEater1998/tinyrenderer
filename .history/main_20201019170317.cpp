@@ -92,8 +92,7 @@ int main(int argc, char** argv) {
 			triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 						vertices_normal[index[0]].av_normal(), 
 						vertices_normal[index[1]].av_normal(), 
-						vertices_normal[index[2]].av_normal(),
-						eye);
+						vertices_normal[index[2]].av_normal());
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, intensity);
 			//triangle(screen_coords, texture_coords, zbuffer, image, texture, light_dir, 
 			//			world_norms[0], world_norms[1], world_norms[2]);

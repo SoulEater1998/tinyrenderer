@@ -350,6 +350,3 @@ bool TGAImage::scale(int w, int h) {
 	return true;
 }
 
-TGAColor TGAColor::operator ^ (const float x){
-	return TGAColor(pow(x, r), pow(x, g), pow(x, b), a);
-}

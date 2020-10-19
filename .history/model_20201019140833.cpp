@@ -82,7 +82,3 @@ Vec3f Model::vert(int i) {
 Vec2f Model::texture_vert(int i){
     return texture_verts_[i];
 }
-
-Vec3f Model::norm(int i) {
-    return norms_[i];
-}
