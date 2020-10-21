@@ -46,6 +46,20 @@ template <class t> struct Vec3 {
 			return z;
 		}
 	}
+	void set(const int i, t li){
+		switch (i)
+		{
+		case 0:
+			x = li;
+			return;
+		case 1:
+			y = li;
+			return;
+		default:
+			z = li;
+			return;
+		}
+	}
 	template <class > friend std::ostream& operator<<(std::ostream& s, Vec3<t>& v);
 };
 

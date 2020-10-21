@@ -65,7 +65,7 @@ struct TGAColor {
 	TGAColor operator ^ (const float x);
 
 	TGAColor operator + (const TGAColor &c){
-		return TGAColor(r + c.r, g + c.g, b + c.b, a);
+		return TGAColor(std::min(r + c.r, 255), std::min(g + c.g, 255), std::min(b + c.b, 255), a);
 	}
 };
 

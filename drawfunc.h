@@ -46,8 +46,8 @@ void line(Vec2i t0, Vec2i t1, TGAImage &image, TGAColor color) {
 	}
 } 
 
-const int width  = 1920; 
-const int height = 1080; 
+const int width  = 960; 
+const int height = 960; 
  
 Vec3f barycentric(Vec3f* pts, Vec3f P) { 
     Vec3f u = Vec3f(pts[2].x-pts[0].x, pts[1].x-pts[0].x, pts[0].x-P.x)^ Vec3f(pts[2].y-pts[0].y, pts[1].y-pts[0].y, pts[0].y-P.y);
@@ -180,11 +180,129 @@ void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage 
                 pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
                 float intensity = pix_normal * light;
                 if(intensity <= 0) continue;
-                TGAColor tempc = tecture.get(Pt.x,Pt.y);
+                TGAColor tempc/*(200,200,200,0)*/=tecture.get(Pt.x,Pt.y);
                 TGAColor diffuse = tempc * intensity;
                 TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
                 TGAColor ambient(5, 5, 5, 0);
                 image.set(P.x, P.y, diffuse + specular * 0.6 + ambient); 
+            }
+        } 
+    }
+}
+
+void triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, Vec3f light,
+                Vec3f n1, Vec3f n2, Vec3f n3, Vec3f eye, float* sbuffer, Vec3f* sts){
+    Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
+    Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
+    for (int i=0; i<3; i++) { 
+        bboxmin.x = std::max(0.f,     std::min(bboxmin.x, pts[i].x)); 
+        bboxmax.x = std::min(clamp.x, std::max(bboxmax.x, pts[i].x)); 
+        bboxmin.y = std::max(0.f,     std::min(bboxmin.y, pts[i].y)); 
+        bboxmax.y = std::min(clamp.y, std::max(bboxmax.y, pts[i].y)); 
+        //TODO:optimize
+    } 
+    Vec3f P; 
+    Vec2i Pt;
+    Vec3f SPt;
+    float shadow;
+    for (P.x=(int)bboxmin.x; P.x<=bboxmax.x; P.x++) { 
+        for (P.y=(int)bboxmin.y; P.y<=bboxmax.y; P.y++) { 
+            Vec3f bc_screen  = barycentric(pts, P); 
+            Vec3f pix_normal;
+            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
+            P.z=pts[0].z*bc_screen.x+pts[1].z*bc_screen.y+pts[2].z*bc_screen.z;
+            if(zbuffer[int(P.x+P.y*width)]<P.z){
+                zbuffer[int(P.x+P.y*width)]=P.z;
+                Pt.x = vts[0].x*bc_screen.x+vts[1].x*bc_screen.y+vts[2].x*bc_screen.z;
+                Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
+
+                SPt.x = sts[0].x*bc_screen.x+sts[1].x*bc_screen.y+sts[2].x*bc_screen.z;
+                SPt.y = sts[0].y*bc_screen.x+sts[1].y*bc_screen.y+sts[2].y*bc_screen.z;
+                SPt.z = sts[0].z*bc_screen.x+sts[1].z*bc_screen.y+sts[2].z*bc_screen.z;
+
+                shadow = (sbuffer[(int)SPt.x+(int)SPt.y*width]>SPt.z-43.34)*0.7+0.3;
+
+                pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
+                float intensity = pix_normal * light;
+                if(intensity <= 0) continue;
+                TGAColor tempc/*(200,200,200,0)*/=tecture.get(Pt.x,Pt.y);
+                TGAColor diffuse = tempc * intensity;
+                TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
+                TGAColor ambient(20, 20, 20, 0);
+                image.set(P.x, P.y, (diffuse * 1.2 + specular) * shadow + ambient); 
+            }
+        } 
+    }
+}
+
+void new_triangle(Vec3f *pts, Vec2i *vts, float* zbuffer, TGAImage &image, TGAImage &tecture, Vec3f light,
+                Vec3f n1, Vec3f n2, Vec3f n3, Vec3f eye, float* sbuffer, Vec3f* sts){
+    Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
+    Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
+    for (int i=0; i<3; i++) { 
+        bboxmin.x = std::max(0.f,     std::min(bboxmin.x, pts[i].x)); 
+        bboxmax.x = std::min(clamp.x, std::max(bboxmax.x, pts[i].x)); 
+        bboxmin.y = std::max(0.f,     std::min(bboxmin.y, pts[i].y)); 
+        bboxmax.y = std::min(clamp.y, std::max(bboxmax.y, pts[i].y)); 
+        //TODO:optimize
+    } 
+    Vec3f P; 
+    Vec2i Pt;
+    Vec3f SPt;
+    Vec3f shadow_bool;
+    for(int j=0; j<3; j++){
+        if(sbuffer[(int)sts[j].x+(int)sts[j].y*width]>sts[j].z-43.34) shadow_bool.set(j, 1.f);
+        else shadow_bool.set(j, 0.f); 
+    }
+    float shadow;
+    for (P.x=(int)bboxmin.x; P.x<=bboxmax.x; P.x++) { 
+        for (P.y=(int)bboxmin.y; P.y<=bboxmax.y; P.y++) { 
+            Vec3f bc_screen  = barycentric(pts, P); 
+            Vec3f pix_normal;
+            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
+            P.z=pts[0].z*bc_screen.x+pts[1].z*bc_screen.y+pts[2].z*bc_screen.z;
+            if(zbuffer[int(P.x+P.y*width)]<P.z){
+                zbuffer[int(P.x+P.y*width)]=P.z;
+                Pt.x = vts[0].x*bc_screen.x+vts[1].x*bc_screen.y+vts[2].x*bc_screen.z;
+                Pt.y = vts[0].y*bc_screen.x+vts[1].y*bc_screen.y+vts[2].y*bc_screen.z;
+
+                shadow = (shadow_bool * bc_screen)*0.7+0.3;
+
+                pix_normal = (n1*bc_screen.x+n2*bc_screen.y+n3*bc_screen.z).normalize();
+                float intensity = pix_normal * light;
+                if(intensity <= 0) continue;
+                TGAColor tempc/*(200,200,200,0)*/=tecture.get(Pt.x,Pt.y);
+                TGAColor diffuse = tempc * intensity;
+                TGAColor specular = tempc * std::max(0.f, (float)pow((light - eye).normalize() * pix_normal, 8));
+                TGAColor ambient(20, 20, 20, 0);
+                image.set(P.x, P.y, (diffuse * 1.2 + specular) * shadow + ambient); 
+            }
+        } 
+    }
+}
+
+void shadow_triangle(Vec3f *pts, float* zbuffer, TGAImage &image){
+    Vec2f bboxmin( std::numeric_limits<float>::max(),  std::numeric_limits<float>::max());
+    Vec2f bboxmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+    Vec2f clamp(image.get_width()-1, image.get_height()-1); 
+    for (int i=0; i<3; i++) { 
+        bboxmin.x = std::max(0.f,     std::min(bboxmin.x, pts[i].x)); 
+        bboxmax.x = std::min(clamp.x, std::max(bboxmax.x, pts[i].x)); 
+        bboxmin.y = std::max(0.f,     std::min(bboxmin.y, pts[i].y)); 
+        bboxmax.y = std::min(clamp.y, std::max(bboxmax.y, pts[i].y)); 
+        //TODO:optimize
+    } 
+    Vec3f P; 
+    Vec2i Pt;
+    for (P.x=(int)bboxmin.x; P.x<=bboxmax.x; P.x++) { 
+        for (P.y=(int)bboxmin.y; P.y<=bboxmax.y; P.y++) { 
+            Vec3f bc_screen  = barycentric(pts, P); 
+            if (bc_screen.x<0 || bc_screen.y<0 || bc_screen.z<0) continue; 
+            P.z=pts[0].z*bc_screen.x+pts[1].z*bc_screen.y+pts[2].z*bc_screen.z;
+            if(zbuffer[int(P.x+P.y*width)]<P.z){
+                zbuffer[int(P.x+P.y*width)]=P.z; 
             }
         } 
     }
@@ -230,11 +348,11 @@ Matrix viewport(int x, int y, int w, int h) {
     Matrix m = Matrix::identity(4);
     m[0][3] = x+w/2.f;
     m[1][3] = y+h/2.f;
-    m[2][3] = 1.f;
+    m[2][3] = 1.25e+5;
 
     m[0][0] = w/2.f;
     m[1][1] = h/2.f;
-    m[2][2] = 1.f;
+    m[2][2] = 1.25e+5;
     return m;
 }
 
